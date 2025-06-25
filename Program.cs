@@ -1,36 +1,27 @@
-namespace EmployeeTrainingPortal.Web
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using EmployeeTrainingPortal.Models;
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+var builder = WebApplication.CreateBuilder(args);
 
-            var app = builder.Build();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+builder.Services.AddControllersWithViews();
 
-            app.UseRouting();
+var app = builder.Build();
 
-            app.UseAuthorization();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            app.Run();
-        }
-    }
-}
+app.Run();
