@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EmployeeTrainingPortal.DAL\EmployeeTrainingPortal.DAL.csproj" />
     <ProjectReference Include="..\EmployeeTrainingPortal.Models\EmployeeTrainingPortal.Models.csproj" />
   </ItemGroup>
 
