@@ -13,11 +13,11 @@ namespace EmployeeTrainingPortal.Utility
             {
                 EnableSsl = true,
                 UseDefaultCredentials = false,
-                Credentials = new NetworkCredential("mohamednasr123@gmail.com", "ilrc benb zjjh vqgw")
+                Credentials = new NetworkCredential("mohamedcalosha4@gmail.com", "msdzmeybggllsqeb")
             };
 
             return client.SendMailAsync(
-                new MailMessage("mohamednasr123@gmail.com", email, subject, htmlMessage)
+                new MailMessage("mohamedcalosha4@gmail.com", email, subject, htmlMessage)
                 {
                     IsBodyHtml = true
                 });
