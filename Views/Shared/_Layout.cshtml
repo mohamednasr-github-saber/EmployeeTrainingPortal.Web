@@ -4,25 +4,27 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Employee Training Portal</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EmployeePortal.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container px-4 px-lg-5">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+        <div class="container">
             <a class="navbar-brand fw-bold" href="/">Employee Training Portal</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    @* General Navigation *@
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Dashboard</a>
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a>
@@ -33,28 +35,41 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Certificates" asp-action="Index">Certificates</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a>
-                    </li>
+
+                    @* Admin Only *@
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                Admin Panel
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Manage Users</a></li>
+                            </ul>
+                        </li>
+                    }
                 </ul>
 
                 <ul class="navbar-nav">
-                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    @if (User.Identity?.IsAuthenticated == true)
                     {
                         <li class="nav-item">
-                            <a class="nav-link disabled">Welcome @User.Identity.Name</a>
+                            <a class="nav-link disabled">Welcome, @User.Identity.Name</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Logout">Logout</a>
+                            <form method="post" asp-area="Identity" asp-controller="Account" asp-action="Logout">
+                                <button class="btn btn-outline-light btn-sm" type="submit">Logout</button>
+                            </form>
                         </li>
                     }
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Register">Register</a>
+                            <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Login">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Login">Login</a>
+                            <a class="nav-link" asp-area="Identity" asp-controller="Account" asp-action="Register">Register</a>
                         </li>
                     }
                 </ul>
@@ -62,21 +77,34 @@
         </div>
     </nav>
 
-    <main role="main" class="pb-3">
+    <!-- Page Content -->
+    <main role="main" class="container py-4">
         @RenderBody()
     </main>
 
-    <footer class="border-top footer text-muted bg-dark">
-        <div class="container">
-            <p class="m-0 text-center text-white">&copy; @DateTime.Now.Year - Employee Training Portal</p>
+    <!-- Footer -->
+    <footer class="footer mt-auto py-3 bg-dark text-white">
+        <div class="container text-center">
+            <span>&copy; @DateTime.Now.Year - Employee Training Portal</span>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="~/js/scripts.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
+    @* Toastr TempData support *@
+    <script>
+        $(function () {
+            var message = '@TempData["Notification"]';
+            if (message) {
+                toastr.success(message);
+            }
+        });
+    </script>
 </body>
 </html>

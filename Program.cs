@@ -5,7 +5,6 @@ using EmployeeTrainingPortal.Models;
 using EmployeeTrainingPortal.DAL.Repositories.IRepositories;
 using EmployeeTrainingPortal.DAL.Repositories;
 using EmployeeTrainingPortal.Utility;
-using ECommerce512.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +25,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 builder.Services.AddScoped<IApplicationUserOtpRepository, ApplicationUserOtpRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+
 // 4. Email Sender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
@@ -45,9 +45,49 @@ app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Account}/{action=Login}/{id?}");
 
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}",
     defaults: new { area = "Identity" });
+
+// 8. Seed Roles and Admin User
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    // Create roles if not exist
+    string[] roles = { "Admin", "Instructor", "Employee" };
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    // Create default admin user if not exist
+    string adminEmail = "admin@portal.com";
+    string adminPassword = "Admin@123"; // You can make this configurable
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+    if (adminUser == null)
+    {
+        var newAdmin = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            NormalizedUserName = "Admin",
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(newAdmin, adminPassword);
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(newAdmin, "Admin");
+        }
+    }
+}
 
 app.Run();

@@ -1,0 +1,73 @@
+﻿@model EmployeeTrainingPortal.ViewModels.AdminDashboardViewModel
+@using EmployeeTrainingPortal.Models
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-4">Admin Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <p class="card-text fs-4">@Model.TotalUsers</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Total Courses</h5>
+                <p class="card-text fs-4">@Model.TotalCourses</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Assessments</h5>
+                <p class="card-text fs-4">@Model.TotalAssessments</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Enrollments</h5>
+                <p class="card-text fs-4">@Model.TotalEnrollments</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-5">Recent Courses</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Instructor</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.RecentCourses != null && Model.RecentCourses.Any())
+        {
+            foreach (var course in Model.RecentCourses)
+            {
+                <tr>
+                    <td>@course.Title</td>
+                    <td>@course.Title</td>
+                    <td>@course.CreatedAt.ToString("dd MMM yyyy")</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center text-muted">No recent courses available.</td>
+            </tr>
+        }
+    </tbody>
+</table>

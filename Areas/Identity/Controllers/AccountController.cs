@@ -35,9 +35,8 @@ namespace EmployeeTrainingPortal.Web.Areas.Identity.Controllers
         {
             if (!_roleManager.Roles.Any())
             {
-                await _roleManager.CreateAsync(new IdentityRole(SD.SuperAdmin));
                 await _roleManager.CreateAsync(new IdentityRole(SD.Admin));
-                await _roleManager.CreateAsync(new IdentityRole(SD.HR));
+                await _roleManager.CreateAsync(new IdentityRole(SD.Instructor));
                 await _roleManager.CreateAsync(new IdentityRole(SD.Employee));
             }
 
@@ -56,7 +55,7 @@ namespace EmployeeTrainingPortal.Web.Areas.Identity.Controllers
             {
                 UserName = registerVM.Email,
                 Email = registerVM.Email,
-                Name = registerVM.UserName
+                NormalizedUserName = registerVM.UserName
             };
 
             var result = await _userManager.CreateAsync(user, registerVM.Password);
@@ -69,6 +68,8 @@ namespace EmployeeTrainingPortal.Web.Areas.Identity.Controllers
                 await _emailSender.SendEmailAsync(user.Email, "Confirm your email", $"Click <a href='{confirmationLink}'>here</a> to confirm your email.");
 
                 await _userManager.AddToRoleAsync(user, SD.Employee);
+                //await _userManager.AddToRoleAsync(user, SD.Instructor);
+
 
                 TempData["Notification"] = "Account created successfully. Please confirm your email.";
                 return RedirectToAction("Login");
@@ -103,6 +104,12 @@ namespace EmployeeTrainingPortal.Web.Areas.Identity.Controllers
                 return View(loginVM);
             }
 
+            if (!await _userManager.IsEmailConfirmedAsync(user))
+            {
+                ModelState.AddModelError("Email", "Please confirm your email before logging in.");
+                return View(loginVM);
+            }
+
             var result = await _signInManager.PasswordSignInAsync(user, loginVM.Password, loginVM.RememberMe, false);
 
             if (result.Succeeded)
@@ -111,19 +118,16 @@ namespace EmployeeTrainingPortal.Web.Areas.Identity.Controllers
 
                 var roles = await _userManager.GetRolesAsync(user);
 
-                if (roles.Contains(SD.SuperAdmin))
-                    return RedirectToAction("Index", "Dashboard", new { area = "SuperAdmin" });
-
                 if (roles.Contains(SD.Admin))
                     return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
 
-                if (roles.Contains(SD.HR))
-                    return RedirectToAction("Index", "Dashboard", new { area = "HR" });
+                if (roles.Contains(SD.Instructor))
+                    return RedirectToAction("Index", "Dashboard", new { area = "Instructor" });
 
                 if (roles.Contains(SD.Employee))
-                    return RedirectToAction("Index", "Dashboard", new { area = "Employee" });
+                    return RedirectToAction("Index", "Enrollment", new { area = "Enrollment" });
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Login");
             }
 
             ModelState.AddModelError("Password", "Invalid Email or Password");
@@ -148,7 +152,8 @@ namespace EmployeeTrainingPortal.Web.Areas.Identity.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var user = await _userManager.FindByEmailAsync(model.UserNameOREmail) ?? await _userManager.FindByNameAsync(model.UserNameOREmail);
+            var user = await _userManager.FindByEmailAsync(model.UserNameOREmail)
+                        ?? await _userManager.FindByNameAsync(model.UserNameOREmail);
 
             if (user == null)
             {
@@ -200,7 +205,8 @@ namespace EmployeeTrainingPortal.Web.Areas.Identity.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var user = await _userManager.FindByEmailAsync(model.UserNameOREmail) ?? await _userManager.FindByNameAsync(model.UserNameOREmail);
+            var user = await _userManager.FindByEmailAsync(model.UserNameOREmail)
+                        ?? await _userManager.FindByNameAsync(model.UserNameOREmail);
 
             if (user == null)
             {

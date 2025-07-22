@@ -14,11 +14,25 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EmployeeTrainingPortal.DAL\EmployeeTrainingPortal.DAL.csproj" />
     <ProjectReference Include="..\EmployeeTrainingPortal.Models\EmployeeTrainingPortal.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Assessment\Controllers\" />
+    <Folder Include="Areas\Assessment\Views\" />
+    <Folder Include="Areas\Course\Controllers\" />
+    <Folder Include="Areas\Course\Views\" />
+    <Folder Include="Areas\Employee\Controllers\" />
+    <Folder Include="Areas\Employee\Views\" />
+    <Folder Include="Areas\Enrollment\Controllers\" />
+    <Folder Include="Areas\Enrollment\Views\" />
+    <Folder Include="Areas\Feedback\Controllers\" />
+    <Folder Include="Areas\Feedback\Views\" />
   </ItemGroup>
 
 </Project>
